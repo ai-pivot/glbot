@@ -1,0 +1,13 @@
+# 私有配置
+processed_comments.json
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# 系统
+.DS_Store

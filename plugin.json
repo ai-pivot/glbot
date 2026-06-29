@@ -1,0 +1,27 @@
+{
+  "id": "my.glbots",
+  "name": "GitLab Code Reviewer",
+  "version": "1.0.0",
+  "description": "GitLab Bot 插件：在被 @mention 时自动对 MR 进行 Code Review 并评论。Poll 模式无需公网 IP。",
+  "runtime": "grpc",
+  "entry": "python3 main.py",
+  "permissions": ["channels.register", "context.enrich"],
+  "contributes": {
+    "channelProvider": {
+      "name": "gitlab",
+      "config_schema": [
+        {"key": "enabled", "label": "启用", "type": "toggle", "default_value": "false"},
+        {"key": "mode", "label": "运行模式", "type": "select", "options": ["poll"], "default_value": "poll"},
+        {"key": "gitlab_url", "label": "GitLab 地址", "type": "text", "default_value": "https://gitlab.com"},
+        {"key": "pat_token", "label": "Personal Access Token", "type": "password", "default_value": ""},
+        {"key": "bot_username", "label": "Bot 用户名", "type": "text", "default_value": "code-reviewer-bot"},
+        {"key": "poll_interval", "label": "轮询间隔（秒）", "type": "number", "default_value": "10"},
+        {"key": "monitored_repos", "label": "监控项目（逗号分隔，留空=自动发现）", "type": "text", "default_value": ""},
+        {"key": "whitelist_repos", "label": "项目白名单（支持 org/* 通配符）", "type": "text", "default_value": ""},
+        {"key": "blacklist_repos", "label": "项目黑名单", "type": "text", "default_value": ""},
+        {"key": "whitelist_users", "label": "用户白名单", "type": "text", "default_value": ""},
+        {"key": "blacklist_users", "label": "用户黑名单", "type": "text", "default_value": ""}
+      ]
+    }
+  }
+}
