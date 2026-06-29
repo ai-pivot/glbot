@@ -418,7 +418,8 @@ def main():
                 log.error("缺少 pat_token")
                 continue
             gitlab_url = CONFIG.get("gitlab_url", GITLAB_API_DEFAULT).rstrip("/") + "/api/v4"
-            GITLAB_CLIENT = GitLabClient(GitLabAuth(token), gitlab_url)
+            verify_ssl = "gitlab.com" in gitlab_url  # 自建实例通常为自签证书
+            GITLAB_CLIENT = GitLabClient(GitLabAuth(token), gitlab_url, verify_ssl=verify_ssl)
             BOT_USERNAME = CONFIG.get("bot_username", "code-reviewer-bot")
             _load_processed()
             declare_tools()

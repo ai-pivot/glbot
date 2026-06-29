@@ -28,9 +28,10 @@ class GitLabAuth:
 class GitLabClient:
     """GitLab API 客户端。"""
 
-    def __init__(self, auth: GitLabAuth, base_url: str = GITLAB_API_DEFAULT):
+    def __init__(self, auth: GitLabAuth, base_url: str = GITLAB_API_DEFAULT, verify_ssl: bool = True):
         self.auth = auth
         self.base_url = base_url.rstrip("/")
+        self.verify_ssl = verify_ssl
         # ETag 缓存
         self._etags: dict[str, str] = {}
 
@@ -54,7 +55,7 @@ class GitLabClient:
         page = 1
         while True:
             params["page"] = page
-            resp = requests.get(url, params=params, headers=self._headers(), timeout=15)
+            resp = requests.get(url, params=params, headers=self._headers(), timeout=15, verify=self.verify_ssl)
             if resp.status_code != 200:
                 break
             data = resp.json()
@@ -81,7 +82,7 @@ class GitLabClient:
         if etag:
             headers["If-None-Match"] = etag
 
-        resp = requests.get(url, params=params, headers=headers, timeout=15)
+        resp = requests.get(url, params=params, headers=headers, timeout=15, verify=self.verify_ssl)
         if resp.status_code == 304:
             return None
 
@@ -108,7 +109,7 @@ class GitLabClient:
         """获取 MR 详情。"""
         pid = self._project_id(project_path)
         url = f"{self.base_url}/projects/{pid}/merge_requests/{mr_iid}"
-        resp = requests.get(url, headers=self._headers(), timeout=15)
+        resp = requests.get(url, headers=self._headers(), timeout=15, verify=self.verify_ssl)
         resp.raise_for_status()
         mr = resp.json()
         return {
@@ -134,7 +135,7 @@ class GitLabClient:
         if etag:
             headers["If-None-Match"] = etag
 
-        resp = requests.get(url, params=params, headers=headers, timeout=15)
+        resp = requests.get(url, params=params, headers=headers, timeout=15, verify=self.verify_ssl)
         if resp.status_code == 304:
             return None
 
@@ -162,7 +163,7 @@ class GitLabClient:
         """获取 MR 的 changes（diff + 文件列表）。"""
         pid = self._project_id(project_path)
         url = f"{self.base_url}/projects/{pid}/merge_requests/{mr_iid}/changes"
-        resp = requests.get(url, headers=self._headers(), timeout=30)
+        resp = requests.get(url, headers=self._headers(), timeout=30, verify=self.verify_ssl)
         resp.raise_for_status()
         data = resp.json()
         files = []
@@ -188,7 +189,7 @@ class GitLabClient:
         """在 MR 上发表普通评论（note）。"""
         pid = self._project_id(project_path)
         url = f"{self.base_url}/projects/{pid}/merge_requests/{mr_iid}/notes"
-        resp = requests.post(url, json={"body": body}, headers=self._headers(), timeout=15)
+        resp = requests.post(url, json={"body": body}, headers=self._headers(), timeout=15, verify=self.verify_ssl)
         resp.raise_for_status()
         return resp.json()
 
@@ -225,7 +226,7 @@ class GitLabClient:
             position["old_line"] = old_line
 
         payload = {"body": body, "position": position}
-        resp = requests.post(url, json=payload, headers=self._headers(), timeout=20)
+        resp = requests.post(url, json=payload, headers=self._headers(), timeout=20, verify=self.verify_ssl)
         resp.raise_for_status()
         return resp.json()
 
