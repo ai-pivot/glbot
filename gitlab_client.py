@@ -230,6 +230,16 @@ class GitLabClient:
         resp.raise_for_status()
         return resp.json()
 
+    def add_reaction(self, project_path: str, mr_iid: int, note_id: int, emoji: str = "eyes"):
+        """给 MR note 添加 emoji 反应。"""
+        pid = self._project_id(project_path)
+        url = f"{self.base_url}/projects/{pid}/merge_requests/{mr_iid}/notes/{note_id}/award_emoji"
+        try:
+            requests.post(url, json={"name": emoji}, headers=self._headers(),
+                         timeout=10, verify=self.verify_ssl)
+        except Exception:
+            pass  # 反应失败不影响主流程
+
     def post_mr_review(
         self,
         project_path: str,

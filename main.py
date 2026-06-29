@@ -207,6 +207,14 @@ def trigger_cr(project_path: str, mr_iid: int, note_body: str, author: str, note
         return
     log.info("CR 请求: %s#%d by @%s", project_path, mr_iid, author)
 
+    # 添加 eyes 反应表示已收到
+    if GITLAB_CLIENT:
+        threading.Thread(
+            target=GITLAB_CLIENT.add_reaction,
+            args=(project_path, mr_iid, note_id, "eyes"),
+            daemon=True,
+        ).start()
+
     chat_id = f"{project_path}#mr-{mr_iid}"
     mr_summary = ""
     try:
