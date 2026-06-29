@@ -76,7 +76,7 @@ class GitLabClient:
         """列出项目的 open MR。使用 ETag 条件请求。"""
         pid = self._project_id(project_path)
         url = f"{self.base_url}/projects/{pid}/merge_requests"
-        params = {"state": "opened", "per_page": 50, "sort": "updated_desc"}
+        params = {"state": "opened", "per_page": 50, "order_by": "updated_at", "sort": "desc"}
         headers = self._headers()
         etag = self._etags.get(f"mrs:{project_path}")
         if etag:
