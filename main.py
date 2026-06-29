@@ -193,7 +193,7 @@ def has_bot_reviewed_before(project_path: str, mr_iid: int) -> bool:
     try:
         notes = GITLAB_CLIENT.get_mr_notes(project_path, mr_iid)
         if notes is None:
-            return True  # ETag 304，保守认为已 review 过
+            return False  # ETag 304 表示没变，之前没写过评论所以肯定没有
         for n in notes:
             if BOT_USERNAME.lower() in n["author"].lower():
                 return True
@@ -255,7 +255,8 @@ def _build_first_prompt(project, mr_iid, mr_summary, author, note_body):
         f"- 行级评论标注：🔴 严重 / 🟡 建议\n"
         f"- 有实质问题把结论放在 body 里，行级问题放在 line_comments 里\n"
         f"- 不要尝试 Fetch gitlab.robocraft.dev（内网地址，无法访问）\n"
-        f"- 不要执行 git clone（你没有权限）"
+        f"- 不要执行 git clone（你没有权限）\n"
+        f"- **发表完评审后立即停止，不要重复发表或追加评论**"
     )
 
 def _build_rereview_prompt(project, mr_iid, mr_summary, author, note_body):
